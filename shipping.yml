@@ -1,0 +1,77 @@
+- name: Configuring shipping app
+  hosts: shipping
+  vars:
+    USER: roboshop
+  become: yes
+  tasks:
+  - name: Installing maven package
+    yum:
+      name: maven
+      state: installed
+
+  - name: check the USER is exist or not.
+    command: id {{USER}}
+    register: output
+    ignor_errors: true
+
+  - name: Create a USER if not exit
+    user:
+      name: "{{USER}}"
+    when: output.rc != 0
+
+  - name: Check the /app exit or not.
+    stat:
+      path: /app
+    register: dir
+
+  - name: Create a DIR if not exit
+    file:
+      path: /app
+      state: directory
+    when: dir.stat.exists == False
+
+  - name: Download the package 
+    get_url:
+      url: https://roboshop-builds.s3.amazonaws.com/shipping.zip
+      dest: /tmp
+
+  - name: Unzip the package
+    unarchive:
+      src: /tmp/shipping.zip
+      dest: /app
+      remote_src: yes
+  
+  - name:  download the dependencies & build the application
+    command: mvn clean package
+      args:
+        chdir: /app
+
+  - name: copy the package
+    copy:
+      src: /app/target/shipping-1.0.jar
+      dest: /app/shipping.jar
+      remote_src: yes
+      
+
+  - name: Setup SystemD Shipping Service
+    copy: 
+      src: shipping.service
+      dest: /etc/systemd/system/shipping.service
+
+  - name: Reload the daemon_reload service
+    systemd:
+      daemon_reload: true
+  
+  - name: Enable & Start the service.
+    service:
+      name: shipping
+      state: started
+      enabled: true
+
+  - name: Load schema
+    command: mysql -h mysql.devopsaws.site -uroot -pRoboShop@1 < /app/schema/shipping.sql 
+
+  - name: Restart the service.
+    service:
+      name: shipping
+      state: restarted
