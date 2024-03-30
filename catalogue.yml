@@ -25,8 +25,8 @@
   - name: Check an app directory exit or not.
     stat:
       path: /app
-      register: dir
-      ignor_errors: true
+    register: dir
+    ignor_errors: true
 
   - name: Create a dir /app if not exit
     file:
@@ -77,7 +77,7 @@
       name: catalogue
       state: started
       enabled: yes
-      
+
 
 
     
