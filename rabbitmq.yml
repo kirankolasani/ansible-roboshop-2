@@ -4,9 +4,11 @@
   tasks:
   - name: Configure YUM Repos from the script provided by vendor.
     command: curl -s https://packagecloud.io/install/repositories/rabbitmq/erlang/script.rpm.sh | bash
+    ignore_errors: true
 
   - name: Configure YUM Repos for RabbitMQ.
     command: curl -s https://packagecloud.io/install/repositories/rabbitmq/rabbitmq-server/script.rpm.sh | bash
+    ingone_errors: true
 
   - name: Install RabbitMQ
     yum:
