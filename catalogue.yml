@@ -59,6 +59,12 @@
     systemd:
       daemon_reload: yes
 
+  - name: Enable & Start the service.
+    service:
+      name: catalogue
+      state: started
+      enabled: yes
+
   - name:  setup MongoDB repo 
     copy:
       src: mongo.repo
@@ -72,11 +78,11 @@
   - name:  Load Schema
     command: mongo --host mongodb.devopsaws.site < /app/schema/catalogue.js
 
-  - name: Enable & Start the service.
+  - name: Restart the service.
     service:
       name: catalogue
-      state: started
-      enabled: yes
+      state: restarted
+      
 
 
 
