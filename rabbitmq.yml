@@ -8,7 +8,7 @@
 
   - name: Configure YUM Repos for RabbitMQ.
     command: curl -s https://packagecloud.io/install/repositories/rabbitmq/rabbitmq-server/script.rpm.sh | bash
-    ingone_errors: true
+    ignore_errors: true
 
   - name: Install RabbitMQ
     yum:
