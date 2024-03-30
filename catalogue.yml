@@ -57,7 +57,7 @@
 
   - name: Load the deamon-reload service.
     systemd:
-      deamon-reload: yes
+      deamon_reload: yes
 
   - name:  setup MongoDB repo 
     copy:
