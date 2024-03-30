@@ -1,0 +1,87 @@
+- name: Installing catalogue application 
+  hosts: catalogue
+  become: yes
+  vars:
+    USER: roboshop
+  tasks:
+
+  - name: Setup NodeJS repos
+    shell: 'curl -sL https://rpm.nodesource.com/setup_lts.x | bash'
+
+  - name: Installing NodeJS
+    yum:
+      name: nodejs 
+      state: installed
+  - name: check application User roboshop existed or not
+    command: id USER
+    register: output
+    ignore_errors: true
+
+  - name: Create a user roboshop if not exit
+    user: 
+      name: USER
+    when: output.rc != 0
+
+  - name: Check an app directory exit or not.
+    stat:
+      path: /app
+      register: dir
+      ignor_errors: true
+
+  - name: Create a dir /app if not exit
+    file:
+      name: /app
+      state: directory
+    when: dir.stat.exists == False
+
+  - name: download the catalogue package
+    get_url:
+      url: curl -o /tmp/catalogue.zip https://roboshop-builds.s3.amazonaws.com/catalogue.zip
+      dest: /tmp
+  
+  - name: Unzip the package file
+    unarchive:
+      src: /tmp/catalogue.zip
+      dest: /app
+      remote_src: yes
+
+  - name: Install  the NPM dependencies
+    command: npm install 
+    args:
+      chdir: /app
+  
+  - name: Copy the catalogue service file
+    copy:
+      src: catalogue.service
+      dest: /etc/systemd/system/catalogue.service
+
+  - name: Load the deamon-reload service.
+    systemd:
+      deamon-reload: yes
+
+  - name:  setup MongoDB repo 
+    copy:
+      src: mongo.repo
+      dest: /etc/yum.repos.d/mongo.repo
+
+  - name: install mongodb-client
+    yum:
+      name: mongodb-org-shell
+      state: installed
+
+  - name:  Load Schema
+    command: mongo --host mongodb.devopsaws.site < /app/schema/catalogue.js
+
+  - name: Enable & Start the service.
+    service:
+      name: catalogue
+      state: started
+      enabled: yes
+      
+
+
+    
+    
+  
+
+
