@@ -30,14 +30,20 @@
       state: directory
     when: dir.stat.exists == False
 
-  - name: Download the package 
-    get_url:
-      url: https://roboshop-builds.s3.amazonaws.com/shipping.zip
-      dest: /tmp
+  # - name: Download the package 
+  #   get_url:
+  #     url: https://roboshop-builds.s3.amazonaws.com/shipping.zip
+  #     dest: /tmp
 
-  - name: Unzip the package
+  # - name: Unzip the package
+  #   unarchive:
+  #     src: /tmp/shipping.zip
+  #     dest: /app
+  #     remote_src: yes
+
+  - name: Download the package & Unzip the package
     unarchive:
-      src: /tmp/shipping.zip
+      src: https://roboshop-builds.s3.amazonaws.com/shipping.zip
       dest: /app
       remote_src: yes
   
@@ -74,7 +80,7 @@
       state: installed
 
   - name: Load schema
-    command: mysql -h mysql.devopsaws.site -uroot -pRoboShop@1 < /app/schema/shipping.sql 
+    shell: mysql -h mysql.devopsaws.site -uroot -pRoboShop@1 < /app/schema/shipping.sql 
 
   - name: Restart the service.
     service:
