@@ -55,9 +55,9 @@
       src: catalogue.service
       dest: /etc/systemd/system/catalogue.service
 
-  - name: Load the deamon-reload service.
+  - name: Load the daemon_reload service.
     systemd:
-      deamon_reload: yes
+      daemon_reload: yes
 
   - name:  setup MongoDB repo 
     copy:
