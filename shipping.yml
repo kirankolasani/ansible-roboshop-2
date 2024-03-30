@@ -11,8 +11,8 @@
 
   - name: check the USER is exist or not.
     command: id {{USER}}
-    register: output
-    ignor_errors: true
+      register: output
+      ignor_errors: true
 
   - name: Create a USER if not exit
     user:
