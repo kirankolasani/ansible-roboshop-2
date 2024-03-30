@@ -35,14 +35,9 @@
       state: directory
     when: dir.stat.exists == False
 
-  - name: download the payment package
-    get_url:
-      url: https://roboshop-builds.s3.amazonaws.com/payment.zip
-      dest: /tmp
-  
-  - name: Unzip the package file
+  - name: Download & Unzip the package file
     unarchive:
-      src: /tmp/payment.zip
+      src: https://roboshop-builds.s3.amazonaws.com/payment.zip
       dest: /app
       remote_src: yes
 
