@@ -13,13 +13,13 @@
       name: nodejs 
       state: installed
   - name: check application User roboshop existed or not
-    command: id USER
+    command: id {{USER}}
     register: output
     ignore_errors: true
 
   - name: Create a user roboshop if not exit
     user: 
-      name: USER
+      name: "{{USER}}"
     when: output.rc != 0
 
   - name: Check an app directory exit or not.
