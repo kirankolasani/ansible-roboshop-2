@@ -43,15 +43,15 @@
   
   - name:  download the dependencies & build the application
     command: mvn clean package
-      args:
-        chdir: /app
+    args:
+      chdir: /app
 
   - name: copy the package
     copy:
       src: /app/target/shipping-1.0.jar
       dest: /app/shipping.jar
       remote_src: yes
-      
+
 
   - name: Setup SystemD Shipping Service
     copy: 
