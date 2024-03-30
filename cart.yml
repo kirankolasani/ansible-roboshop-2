@@ -1,0 +1,75 @@
+- name: Installing cart application 
+  hosts: cart
+  become: yes
+  vars:
+    USER: roboshop
+  tasks:
+
+  - name: Setup NodeJS repos
+    shell: 'curl -sL https://rpm.nodesource.com/setup_lts.x | bash'
+
+  - name: Installing NodeJS
+    yum:
+      name: nodejs 
+      state: installed
+  - name: check application User roboshop existed or not
+    command: id {{USER}}
+    register: output
+    ignore_errors: true
+
+  - name: Create a user roboshop if not exit
+    user: 
+      name: "{{USER}}"
+    when: output.rc != 0
+
+  - name: Check an app directory exit or not.
+    stat:
+      path: /app
+    register: dir
+    
+
+  - name: Create a dir /app if not exit
+    file:
+      name: /app
+      state: directory
+    when: dir.stat.exists == False
+
+  - name: download the cart package
+    get_url:
+      url: https://roboshop-builds.s3.amazonaws.com/cart.zip
+      dest: /tmp
+  
+  - name: Unzip the cart package file
+    unarchive:
+      src: /tmp/cart.zip
+      dest: /app
+      remote_src: yes
+
+  - name: Install  the NPM dependencies
+    command: npm install 
+    args:
+      chdir: /app
+  
+  - name: Copy the cart service file
+    copy:
+      src: cart.service
+      dest: /etc/systemd/system/cart.service
+
+  - name: Load the daemon_reload service.
+    systemd:
+      daemon_reload: yes
+
+  - name: Enable & Start the cart service.
+    service:
+      name: cart
+      state: started
+      enabled: yes
+
+
+
+
+    
+    
+  
+
+
