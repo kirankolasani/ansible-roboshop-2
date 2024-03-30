@@ -68,6 +68,11 @@
       state: started
       enabled: true
 
+  - name: install mysql client
+    yum: 
+      name: mysql
+      state: installed
+
   - name: Load schema
     command: mysql -h mysql.devopsaws.site -uroot -pRoboShop@1 < /app/schema/shipping.sql 
 
