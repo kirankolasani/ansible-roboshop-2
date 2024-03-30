@@ -26,7 +26,8 @@
   - name: Extract the frontend content.
     unarchive:
       path: /tmp/web.zip
-      dest: /usr/share/nginx/html
+      dest: /usr/share/nginx/html/
+      remote_src: yes
 
   - name: Create Nginx Reverse Proxy Configuration.
     copy: 
