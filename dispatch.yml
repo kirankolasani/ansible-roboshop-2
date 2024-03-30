@@ -1,0 +1,66 @@
+- name: Configuring dispatch application.
+  hosts: dispatch
+  vars:
+    USER: roboshop
+  become: yes
+  vars:
+    USER: roboshop
+  tasks:
+  - name: Installing GoLang
+    yum:
+      name: golang
+      state: installed
+
+  - name: check application User roboshop existed or not
+    command: id {{USER}}
+    register: output
+    ignore_errors: true
+
+  - name: Create a user roboshop if not exit
+    user: 
+      name: "{{USER}}"
+    when: output.rc != 0
+
+  - name: Check an app directory exit or not.
+    stat:
+      path: /app
+    register: dir
+    
+  - name: Create a dir /app if not exit
+    file:
+      name: /app
+      state: directory
+    when: dir.stat.exists == False
+
+  - name: Download & Unzip the package file
+    unarchive:
+      src: https://roboshop-builds.s3.amazonaws.com/dispatch.zip
+      dest: /app
+      remote_src: yes
+
+  - name: download the dependencies & build the software.
+    command: "{{item}}"
+    args:
+      chdir: /app
+    loop:
+    - "go mod init dispatch"
+    - "go get"
+    - "go build"
+
+  - name: Copy dispatch.service file
+    copy:
+      src: dispatch.service
+      dest: /etc/systemd/system/dispatch.service
+
+  - name: Reload the daemon_reload service
+    systemd:
+      daemon_reload: true
+  
+  - name: Enable & Start the service.
+    service:
+      name: dispatch
+      state: started
+      enabled: true
+
+
+  
